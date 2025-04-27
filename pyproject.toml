@@ -1,0 +1,16 @@
+[project]
+name = "dsde-final"
+version = "0.1.0"
+description = "Final project for DSDE"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "geopandas>=1.0.1",
+    "h3>=4.2.2",
+    "pandas>=2.2.3",
+    "qdrant-client>=1.14.2",
+    "requests>=2.32.3",
+    "ruff>=0.11.7",
+    "sentence-transformers>=4.1.0",
+    "sqlalchemy>=2.0.40",
+]
