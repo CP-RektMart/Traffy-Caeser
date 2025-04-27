@@ -17,11 +17,20 @@ git clone https://github.com/CP-RektMart/Traffy-Caeser
 cd Traffy-Caeser
 ```
 
-2. run docker compose
+2. activate venv
+
+```
+uv venv
+```
+
+3. run docker compose
 
 ```
 docker-compose up -d
 ```
 
-3. start server
-   uv run main.py
+4. start server
+
+```
+uv run main.py
+```
