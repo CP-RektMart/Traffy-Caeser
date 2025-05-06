@@ -29,7 +29,15 @@ uv venv
 docker-compose up -d
 ```
 
-4. start server
+4. create venv and activate
+
+```
+uv venv
+
+.venv\Scripts\activate
+```
+
+5. start server
 
 ```
 uv run main.py

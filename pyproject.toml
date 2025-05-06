@@ -11,6 +11,23 @@ dependencies = [
     "qdrant-client>=1.14.2",
     "requests>=2.32.3",
     "ruff>=0.11.7",
+    "scikit-learn>=1.6.1",
     "sentence-transformers>=4.1.0",
     "sqlalchemy>=2.0.40",
+    "torch>=2.7.0",
 ]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.11.7",
+]
+
+[project.scripts]
+de = "traffy_caeser.data_eng.main:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/traffy_caeser"]

@@ -99,7 +99,7 @@ wheels = [
 [[package]]
 name = "dsde-final"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "geopandas" },
     { name = "h3" },
@@ -107,8 +107,15 @@ dependencies = [
     { name = "qdrant-client" },
     { name = "requests" },
     { name = "ruff" },
+    { name = "scikit-learn" },
     { name = "sentence-transformers" },
     { name = "sqlalchemy" },
+    { name = "torch" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "ruff" },
 ]
 
 [package.metadata]
@@ -119,9 +126,14 @@ requires-dist = [
     { name = "qdrant-client", specifier = ">=1.14.2" },
     { name = "requests", specifier = ">=2.32.3" },
     { name = "ruff", specifier = ">=0.11.7" },
+    { name = "scikit-learn", specifier = ">=1.6.1" },
     { name = "sentence-transformers", specifier = ">=4.1.0" },
     { name = "sqlalchemy", specifier = ">=2.0.40" },
+    { name = "torch", specifier = ">=2.7.0" },
 ]
+
+[package.metadata.requires-dev]
+dev = [{ name = "ruff", specifier = ">=0.11.7" }]
 
 [[package]]
 name = "filelock"
