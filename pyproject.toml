@@ -5,15 +5,24 @@ description = "Final project for DSDE"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+    "db-dtypes>=1.4.2",
+    "dotenv>=0.9.9",
     "geopandas>=1.0.1",
+    "google-cloud>=0.34.0",
+    "google-cloud-bigquery>=3.31.0",
     "h3>=4.2.2",
+    "matplotlib>=3.10.1",
     "pandas>=2.2.3",
+    "plotly>=6.0.1",
+    "pydeck>=0.9.1",
     "qdrant-client>=1.14.2",
     "requests>=2.32.3",
     "ruff>=0.11.7",
     "scikit-learn>=1.6.1",
     "sentence-transformers>=4.1.0",
     "sqlalchemy>=2.0.40",
+    "storage>=0.0.4.3",
+    "streamlit>=1.45.0",
     "torch>=2.7.0",
 ]
 
@@ -24,6 +33,8 @@ dev = [
 
 [project.scripts]
 de = "traffy_caeser.data_eng.main:main"
+ds = "traffy_caeser.data_sci.main:main"
+dv = "traffy_caeser.data_viz.run:main"
 
 [build-system]
 requires = ["hatchling"]
