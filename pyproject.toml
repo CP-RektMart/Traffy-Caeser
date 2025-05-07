@@ -5,6 +5,7 @@ description = "Final project for DSDE"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+    "apache-beam>=2.64.0",
     "db-dtypes>=1.4.2",
     "dotenv>=0.9.9",
     "geopandas>=1.0.1",
