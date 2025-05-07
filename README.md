@@ -34,5 +34,12 @@ docker-compose up -d
 4. start server
 
 ```
+# Run main script
 uv run main.py
+```
+
+```
+# Run visualization
+uv run dv
+or dv
 ```
