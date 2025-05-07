@@ -1,46 +1,54 @@
 import os
 from google.cloud import bigquery
-from google.cloud import bigquery
 from google.oauth2 import service_account
 from dotenv import load_dotenv
 import time
+import matplotlib.pyplot as plt
 
-load_dotenv()
+load_dotenv(override=True)
 
 PROJECT_ID = os.getenv("PROJECT_ID")
 DATASET = os.getenv("BQ_DATASET")
-TABLE_RAW = os.getenv("BQ_TABLE_RAW")
 TABLE_CLUSTER = os.getenv("BQ_TABLE_CLUSTERED")
 
 QUERY = f"""
-WITH coords_extracted AS (
-  SELECT
-    cr.ticket_id                      AS id,
-    COALESCE(cr.comment, tr.comment) AS comments,
-    SAFE_CAST(TRIM(SPLIT(tr.coords, ',')[OFFSET(1)]) AS FLOAT64) AS latitude,
-    SAFE_CAST(TRIM(SPLIT(tr.coords, ',')[OFFSET(0)]) AS FLOAT64) AS longitude,
-    cr.vector,
-    cr.cluster,
-    cr.PC1,
-    cr.PC2,
-    cr.PC3
-  FROM `{PROJECT_ID}.{DATASET}.{TABLE_CLUSTER}` AS cr
-  LEFT JOIN `{PROJECT_ID}.{DATASET}.{TABLE_RAW}` AS tr
-  ON cr.ticket_id = tr.ticket_id
-)
-SELECT *
-FROM coords_extracted
-WHERE latitude IS NOT NULL AND longitude IS NOT NULL
+SELECT
+  ticket_id AS id,
+  comment,
+  latitude,
+  longitude,
+  cluster,
+  PC1,
+  PC2,
+  PC3
+FROM `{PROJECT_ID}.{DATASET}.{TABLE_CLUSTER}`
 LIMIT 1000
 """
 
 
-def prepare_data(input_df=None):
-    print(PROJECT_ID, DATASET, TABLE_RAW, TABLE_CLUSTER)
+def prepare_data():
+    print(PROJECT_ID, DATASET, TABLE_CLUSTER)
     client = bigquery.Client(project=PROJECT_ID)
     print("Client created")
-    df = client.query(QUERY).to_dataframe()
+    start = time.time()
+    viz_data = client.query(QUERY).to_dataframe()
     print("Query executed")
-    # Current columns:
-    # ['id', 'comments', 'latitude', 'longitude', 'vector', 'cluster', 'PC1', 'PC2', 'PC3']
-    return df
+    print("Time taken:", time.time() - start)
+    print("Dataframe shape:", viz_data.shape)
+
+    clusters_count = viz_data["cluster"].value_counts().reset_index()
+    clusters_count.columns = ["cluster", "count"]
+
+    unique_clusters = sorted(viz_data["cluster"].unique())
+    colormap = plt.get_cmap("hsv")
+    cluster_colors = {
+        cluster: [int(x * 255) for x in colormap(i / len(unique_clusters))[:3]] + [160]
+        for i, cluster in enumerate(unique_clusters)
+    }
+
+    viz_data["color"] = viz_data["cluster"].map(lambda c: cluster_colors[c])
+    color_map = {
+        cluster: f"rgba({r},{g},{b},{a/255})"
+        for cluster, (r, g, b, a) in cluster_colors.items()
+    }
+    return viz_data, clusters_count, cluster_colors, color_map
