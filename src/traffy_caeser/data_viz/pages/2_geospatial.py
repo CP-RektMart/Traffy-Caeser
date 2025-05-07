@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import pydeck as pdk
-from matplotlib import pyplot as plt
 from traffy_caeser.data_viz.prepare_viz import prepare_data
 
 st.title("Geospatial Visualization")
@@ -11,6 +10,8 @@ st.title("Geospatial Visualization")
 def load_data_cached():
     return prepare_data()
 
+
+viz_data, clusters_counts, cluster_colors, color_map = load_data_cached()
 
 MAP_STYLES = {
     "Dark": "mapbox://styles/mapbox/dark-v10",
@@ -22,60 +23,104 @@ MAP_STYLES = {
     "Outdoors": "mapbox://styles/mapbox/outdoors-v11",
 }
 
-viz_data, clusters_counts, cluster_colors, color_map = load_data_cached()
+MAX_POINTS = 100_000
+st.sidebar.subheader("Filter Clusters")
+unique_clusters = sorted(viz_data["cluster"].unique())
+selected_clusters = []
+for c in unique_clusters:
+    if st.sidebar.checkbox(f"Cluster {c}", value=True, key=f"cluster_{c}"):
+        selected_clusters.append(c)
 
-try:
-    # Scatter map
-    st.subheader("Problems labeled by clusters")
-    layer1 = pdk.Layer(
-        "ScatterplotLayer",
-        viz_data,
-        pickable=True,
-        opacity=0.92,
-        stroked=False,
-        filled=True,
-        radius_scale=200,
-        get_position="[longitude, latitude]",
-        get_fill_color="color",
-    )
-    st.pydeck_chart(
-        pdk.Deck(
-            map_style=MAP_STYLES["Road"],
-            initial_view_state=pdk.ViewState(
-                latitude=viz_data["latitude"].median(),
-                longitude=viz_data["longitude"].median(),
-                zoom=10,
-                pitch=1,
-            ),
-            layers=[layer1],
-        ),
-        use_container_width=True,
-        height=600,
-    )
 
-    # Heatmap
-    st.subheader("Problems heatmap")
-    layer2 = pdk.Layer(
-        "HeatmapLayer",
-        viz_data,
-        pickable=True,
-        opacity=0.6,
-        get_position="[longitude, latitude]",
-    )
-    st.pydeck_chart(
-        pdk.Deck(
-            map_style=MAP_STYLES["Satellite_Streets"],
-            initial_view_state=pdk.ViewState(
-                latitude=viz_data["latitude"].median(),
-                longitude=viz_data["longitude"].median(),
-                zoom=11,
-                pitch=0,
-            ),
-            layers=[layer2],
-        ),
-        use_container_width=True,
-        height=600,
-    )
+filtered_viz = viz_data[viz_data["cluster"].isin(selected_clusters)]
 
-except Exception as e:
-    st.error(f"Error in geospatial analysis: {e}")
+
+default_lat = viz_data["latitude"].median()
+default_lon = viz_data["longitude"].median()
+
+if filtered_viz.empty:
+    st.warning("No clusters selected — showing all clusters.")
+    filtered = viz_data
+    view_lat, view_lon = default_lat, default_lon
+else:
+    filtered = filtered_viz
+    view_lat = filtered["latitude"].median()
+    view_lon = filtered["longitude"].median()
+
+n_pts = len(filtered)
+if n_pts > MAX_POINTS:
+    st.info(f"Sampling {MAX_POINTS:,} of {n_pts:,} points for performance.")
+    filtered = filtered.sample(MAX_POINTS, random_state=42)
+
+filtered["short_comment"] = filtered["comment"].str.slice(0, 200).fillna("") + "…"
+viz_cols = [
+    "id",
+    "latitude",
+    "longitude",
+    "cluster",
+    "color",
+    "short_comment",
+    "photo",
+    "address",
+    "color",
+]
+filtered = filtered[viz_cols]
+
+scatter = pdk.Layer(
+    "ScatterplotLayer",
+    data=filtered,
+    pickable=True,
+    autoHighlight=True,
+    stroked=False,
+    filled=True,
+    opacity=0.7,
+    radius_min_pixels=2,
+    radius_max_pixels=6,
+    get_position=["longitude", "latitude"],
+    get_fill_color="color",
+    minZoom=100,
+)
+
+tooltip = {
+    "html": """
+      <div style="
+        max-width: 320px;
+        white-space: normal;
+        overflow-wrap: anywhere;
+        font-size: 12px;
+        color: white;
+      ">
+        <!-- fixed-size image -->
+        <img
+          src="{photo}"
+          style="
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 6px;
+          "
+          alt="photo"
+        />
+        <b>ID:</b> {id}<br/>
+        <b>Cluster:</b> {cluster}<br/>
+        <b>Comment:</b> {short_comment}
+      </div>
+    """,
+    "style": {"backgroundColor": "rgba(0, 0, 0, 0.8)", "padding": "8px"},
+}
+
+
+deck = pdk.Deck(
+    map_style=MAP_STYLES["Road"],
+    initial_view_state=pdk.ViewState(
+        latitude=view_lat,
+        longitude=view_lon,
+        zoom=10,
+        pitch=0,
+    ),
+    layers=[scatter],
+    tooltip=tooltip,
+)
+
+st.pydeck_chart(deck, use_container_width=True, height=600)

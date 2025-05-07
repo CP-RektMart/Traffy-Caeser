@@ -1,34 +1,38 @@
-import os
 from google.cloud import bigquery
 from google.oauth2 import service_account
-from dotenv import load_dotenv
 import time
+import streamlit as st
 import matplotlib.pyplot as plt
 
-load_dotenv(override=True)
+credentials = service_account.Credentials.from_service_account_info(
+    st.secrets["gcp_service_account"]
+)
 
-PROJECT_ID = os.getenv("PROJECT_ID")
-DATASET = os.getenv("BQ_DATASET")
-TABLE_CLUSTER = os.getenv("BQ_TABLE_CLUSTERED")
+PROJECT_ID = st.secrets["PROJECT_ID"]
+DATASET = st.secrets["BQ_DATASET"]
+TABLE_CLUSTER = st.secrets["BQ_TABLE_CLUSTERED"]
 
 QUERY = f"""
 SELECT
   ticket_id AS id,
   comment,
+  address,
+  photo,
   latitude,
   longitude,
+  last_activity,
   cluster,
   PC1,
   PC2,
   PC3
 FROM `{PROJECT_ID}.{DATASET}.{TABLE_CLUSTER}`
-LIMIT 1000
+ORDER BY last_activity DESC
+LIMIT 200000
 """
 
 
 def prepare_data():
-    print(PROJECT_ID, DATASET, TABLE_CLUSTER)
-    client = bigquery.Client(project=PROJECT_ID)
+    client = bigquery.Client(credentials=credentials, project=PROJECT_ID)
     print("Client created")
     start = time.time()
     viz_data = client.query(QUERY).to_dataframe()
