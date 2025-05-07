@@ -21,6 +21,8 @@ cd Traffy-Caeser
 
 ```
 uv venv
+
+.venv\Scripts\activate
 ```
 
 3. run docker compose
@@ -29,15 +31,7 @@ uv venv
 docker-compose up -d
 ```
 
-4. create venv and activate
-
-```
-uv venv
-
-.venv\Scripts\activate
-```
-
-5. start server
+4. start server
 
 ```
 uv run main.py
