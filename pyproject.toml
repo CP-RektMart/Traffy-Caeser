@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "apache-beam>=2.64.0",
+    "bs4>=0.0.2",
     "db-dtypes>=1.4.2",
     "dotenv>=0.9.9",
     "geopandas>=1.0.1",

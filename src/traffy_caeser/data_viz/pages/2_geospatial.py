@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import pydeck as pdk
+import html
 from traffy_caeser.data_viz.prepare_viz import prepare_data
 
 st.title("Geospatial Visualization")
@@ -11,7 +12,8 @@ def load_data_cached():
     return prepare_data()
 
 
-viz_data, clusters_counts, cluster_colors, color_map = load_data_cached()
+viz_data, clusters_counts, cluster_colors, color_map, scraped_traffic = load_data_cached()
+
 
 MAP_STYLES = {
     "Dark": "mapbox://styles/mapbox/dark-v10",
@@ -124,3 +126,28 @@ deck = pdk.Deck(
 )
 
 st.pydeck_chart(deck, use_container_width=True, height=600)
+
+st.write(
+    f"Showing {len(filtered):,} points from {len(viz_data):,} total points. "
+    f"Showing {len(selected_clusters)} clusters out of {len(unique_clusters)}."
+)
+
+scraped_traffic = pd.DataFrame(scraped_traffic)
+st.subheader("Latest Traffic Incidents (Scraped from จส.100)")
+
+html_blocks = """<div style="display: flex; align-items: center; font-weight: bold; background-color: #eee; padding: 8px 6px; border-bottom: 1px solid #ccc;">
+    <div style="flex: 0 0 10%; text-align: center;">Time</div>
+    <div style="flex: 1;">Description</div>
+</div>"""
+
+for _, row in scraped_traffic.iterrows():
+    html_blocks += f"""
+    <div style="display: flex; align-items: center; margin: 6px 0; padding: 6px;">
+        <div style="flex: 0 0 20%; text-align: center; padding: 0px 5px;">{row["time"]}</div>
+        <div style="flex: 1;">{row["description"]}</div>
+    </div>"""
+
+st.markdown(
+    f'<div style="max-height: 400px; overflow-y: auto; padding: 10px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9;">{html_blocks}</div>',
+    unsafe_allow_html=True,
+)
