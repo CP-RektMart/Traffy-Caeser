@@ -9,6 +9,7 @@ dependencies = [
     "bs4>=0.0.2",
     "db-dtypes>=1.4.2",
     "dotenv>=0.9.9",
+    "fastkml>=1.1.0",
     "geopandas>=1.0.1",
     "google-cloud>=0.34.0",
     "google-cloud-bigquery>=3.31.0",

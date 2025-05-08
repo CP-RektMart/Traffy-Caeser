@@ -1,11 +1,11 @@
 import streamlit as st
 import pandas as pd
 import pydeck as pdk
-import html
+import random
+from fastkml import KML
 from traffy_caeser.data_viz.prepare_viz import prepare_data
 
 st.title("Geospatial Visualization")
-
 
 @st.cache_data
 def load_data_cached():
@@ -68,6 +68,38 @@ viz_cols = [
 ]
 filtered = filtered[viz_cols]
 
+kml_path = 'data/base_kml.kml'
+
+k = KML.parse(kml_path)
+features = list(k.features)
+placemarks = list(features[0].features)
+
+data = []
+for pm in placemarks:
+    geom = pm.geometry
+    
+    #randomize color
+    colorRand = [random.randint(150, 255) for _ in range(4)]
+
+    coords = list(geom.exterior.coords)
+    data.append({
+        'name': pm.name,
+        'location': coords,
+        'color': colorRand,
+    })
+
+poly_district = pdk.Layer(
+        'PolygonLayer',
+        data=data,
+        get_polygon='location',
+        get_fill_color='color',  # RGBA
+        opacity=0.05,
+        pickable=False,
+        extruded=False,
+        filled=True,
+        line_width_min_pixels=1,
+    )
+
 scatter = pdk.Layer(
     "ScatterplotLayer",
     data=filtered,
@@ -121,7 +153,7 @@ deck = pdk.Deck(
         zoom=10,
         pitch=0,
     ),
-    layers=[scatter],
+    layers=[scatter, poly_district],
     tooltip=tooltip,
 )
 
