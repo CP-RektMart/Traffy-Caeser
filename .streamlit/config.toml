@@ -1,3 +1,5 @@
 [server]
 maxMessageSize = 500
 fileWatcherType = "none"
+runOnSave = true
+headless = true

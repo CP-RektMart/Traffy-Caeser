@@ -23,7 +23,7 @@ def load_data_cached():
 
 
 with st.spinner("Loading PCA clustering plot..."):
-    viz_data, clusters_counts, cluster_colors, color_map = load_data_cached()
+    viz_data, clusters_counts, cluster_colors, color_map, scraped_traffic = load_data_cached()
 
     st.subheader("3D PCA Clustering Plot")
     fig = px.scatter_3d(

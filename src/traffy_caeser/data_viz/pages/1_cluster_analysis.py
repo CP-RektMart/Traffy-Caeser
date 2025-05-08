@@ -12,7 +12,7 @@ def load_data_cached():
 
 
 with st.spinner("Loading Clustering analysis..."):
-    viz_data, clusters_counts, cluster_colors, color_map = load_data_cached()
+    viz_data, clusters_counts, cluster_colors, color_map, scraped_traffic = load_data_cached()
     try:
         # pie chart
         st.subheader("Cluster Statistics")
