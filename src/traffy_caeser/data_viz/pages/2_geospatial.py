@@ -7,12 +7,15 @@ from traffy_caeser.data_viz.prepare_viz import prepare_data
 
 st.title("Geospatial Visualization")
 
+
 @st.cache_data
 def load_data_cached():
     return prepare_data()
 
 
-viz_data, clusters_counts, cluster_colors, color_map, scraped_traffic = load_data_cached()
+viz_data, clusters_counts, cluster_colors, color_map, scraped_traffic = (
+    load_data_cached()
+)
 
 
 MAP_STYLES = {
@@ -27,7 +30,7 @@ MAP_STYLES = {
 
 MAX_POINTS = 100_000
 st.sidebar.subheader("Filter Clusters")
-unique_clusters = sorted(viz_data["cluster"].unique())
+unique_clusters = sorted([int(c) for c in viz_data["cluster"].unique()])
 selected_clusters = []
 for c in unique_clusters:
     if st.sidebar.checkbox(f"Cluster {c}", value=True, key=f"cluster_{c}"):
@@ -68,7 +71,7 @@ viz_cols = [
 ]
 filtered = filtered[viz_cols]
 
-kml_path = 'data/base_kml.kml'
+kml_path = "data/base_kml.kml"
 
 k = KML.parse(kml_path)
 features = list(k.features)
@@ -77,28 +80,30 @@ placemarks = list(features[0].features)
 data = []
 for pm in placemarks:
     geom = pm.geometry
-    
-    #randomize color
+
+    # randomize color
     colorRand = [random.randint(150, 255) for _ in range(4)]
 
     coords = list(geom.exterior.coords)
-    data.append({
-        'name': pm.name,
-        'location': coords,
-        'color': colorRand,
-    })
+    data.append(
+        {
+            "name": pm.name,
+            "location": coords,
+            "color": colorRand,
+        }
+    )
 
 poly_district = pdk.Layer(
-        'PolygonLayer',
-        data=data,
-        get_polygon='location',
-        get_fill_color='color',  # RGBA
-        opacity=0.05,
-        pickable=False,
-        extruded=False,
-        filled=True,
-        line_width_min_pixels=1,
-    )
+    "PolygonLayer",
+    data=data,
+    get_polygon="location",
+    get_fill_color="color",  # RGBA
+    opacity=0.05,
+    pickable=False,
+    extruded=False,
+    filled=True,
+    line_width_min_pixels=1,
+)
 
 scatter = pdk.Layer(
     "ScatterplotLayer",
@@ -167,19 +172,36 @@ st.write(
 scraped_traffic = pd.DataFrame(scraped_traffic)
 st.subheader("Latest Traffic Incidents (Scraped from จส.100)")
 
-html_blocks = """<div style="display: flex; align-items: center; font-weight: bold; background-color: #eee; padding: 8px 6px; border-bottom: 1px solid #ccc;">
+# Detect current theme
+theme = st.get_option("theme.base")
+if theme == "dark":
+    header_bg_color = "#262730"  # Darker background for header in dark mode
+    header_text_color = "#FAFAFA"
+    row_bg_color = "#1E1E1E"  # Slightly lighter than header for rows
+    row_text_color = "#FAFAFA"
+    border_color = "#444"
+    container_bg_color = "#0E1117"  # Streamlit's default dark background
+else:
+    header_bg_color = "#eee"
+    header_text_color = "#333"
+    row_bg_color = "#f9f9f9"
+    row_text_color = "#333"
+    border_color = "#ccc"
+    container_bg_color = "#f9f9f9"
+
+html_blocks = f"""<div style="display: flex; align-items: center; font-weight: bold; background-color: {header_bg_color}; color: {header_text_color}; padding: 8px 6px; border-bottom: 1px solid {border_color};">
     <div style="flex: 0 0 10%; text-align: center;">Time</div>
     <div style="flex: 1;">Description</div>
 </div>"""
 
 for _, row in scraped_traffic.iterrows():
     html_blocks += f"""
-    <div style="display: flex; align-items: center; margin: 6px 0; padding: 6px;">
+    <div style="display: flex; align-items: center; margin: 6px 0; padding: 6px; background-color: {row_bg_color}; color: {row_text_color}; border-bottom: 1px solid {border_color};">
         <div style="flex: 0 0 20%; text-align: center; padding: 0px 5px;">{row["time"]}</div>
         <div style="flex: 1;">{row["description"]}</div>
     </div>"""
 
 st.markdown(
-    f'<div style="max-height: 400px; overflow-y: auto; padding: 10px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9;">{html_blocks}</div>',
+    f'<div style="max-height: 400px; overflow-y: auto; padding: 10px; border: 1px solid {border_color}; border-radius: 8px; background-color: {container_bg_color};">{html_blocks}</div>',
     unsafe_allow_html=True,
 )

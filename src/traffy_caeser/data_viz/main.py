@@ -2,71 +2,57 @@ import streamlit as st
 from plotly import express as px
 from traffy_caeser.data_viz.prepare_viz import prepare_data
 import pandas as pd
+import os
 
+# Page configuration
 st.set_page_config(page_title="Traffy Ceaser: Comments Analysis", layout="wide")
 
-st.title("Welcome to Traffy Ceaser Analytics")
+# Create columns for layout
+col1, col2 = st.columns([2, 1])
+
+with col1:
+    st.title("Welcome to Traffy Ceaser Analytics")
+
+    st.markdown(
+        """
+    ## About Traffy Ceaser
+    Traffy Ceaser is an advanced analytics system designed to process and analyze public comments and feedback. 
+    The system helps identify patterns, trends, and insights from user-submitted data to improve public services and urban management.
+    
+    ## Dashboard Overview
+    This interactive dashboard provides visualization tools to explore the processed data:
+    - **Clustering Analysis**: Explore how comments are grouped by similarity and topics
+    - **Geospatial Visualizations**: View the geographical distribution of comments across regions
+    
+    Use the sidebar to navigate between different analysis pages and explore the data in depth.
+    """
+    )
+
+with col2:
+    # Display an image (assumed to be in an assets folder)
+    image_path = os.path.join(os.path.dirname(__file__), "assets", "traffy_logo.png")
+    print(image_path)
+    # Fallback to a URL if local image doesn't exist
+    try:
+        if os.path.exists(image_path):
+            st.image(image_path, width=200)
+    except Exception as e:
+        st.write("Could not load image.")
+
+st.markdown("---")
 
 st.markdown(
     """
-This dashboard contains:
+## Available Analysis Tools
 - **Clustering Analysis** (See: `cluster_analysis`)
+    - Bar chart of cluster sizes
+    - 3D PCA plot of clusters
+    - Cluster samples and summary
+    
 - **Geospatial Visualizations** (See: `geospatial`)
-Use the sidebar to navigate between pages.
+    - Geographic distribution of clusters
+    - Realtime traffic incidents reporting 
+
+Navigate using the sidebar to explore each analysis in detail.
 """
 )
-
-
-@st.cache_data
-def load_data_cached():
-    return prepare_data()
-
-
-with st.spinner("Loading PCA clustering plot..."):
-    viz_data, clusters_counts, cluster_colors, color_map, scraped_traffic = load_data_cached()
-
-    st.subheader("3D PCA Clustering Plot")
-    fig = px.scatter_3d(
-        viz_data,
-        x="PC1",
-        y="PC2",
-        z="PC3",
-        color="cluster",
-        opacity=0.3,
-        color_discrete_map=color_map,
-        height=600,
-        width=800,
-    )
-
-    fig.update_layout(
-        scene=dict(
-            xaxis=dict(title="PC1", title_font=dict(size=16), tickfont=dict(size=12)),
-            yaxis=dict(title="PC2", title_font=dict(size=16), tickfont=dict(size=12)),
-            zaxis=dict(title="PC3", title_font=dict(size=16), tickfont=dict(size=12)),
-        ),
-        legend=dict(
-            orientation="h",
-            yanchor="bottom",
-            y=-0.3,
-            xanchor="center",
-            x=0.5,
-            title=dict(text="Cluster", font=dict(size=14)),
-            font=dict(size=12),
-        ),
-        margin=dict(l=20, r=20, t=50, b=20),
-        scene_camera=dict(eye=dict(x=1.5, y=1.5, z=0.5)),
-    )
-
-    fig.update_traces(marker=dict(size=6, opacity=0.4))
-
-    st.plotly_chart(fig, use_container_width=True)
-
-    st.subheader("Sample Comments by Cluster (5 per cluster)")
-
-    for cluster in sorted(viz_data["cluster"].unique()):
-        cluster_comments = viz_data[viz_data["cluster"] == cluster]["comment"]
-        n = min(5, len(cluster_comments))
-        samples = cluster_comments.sample(n)
-        st.markdown(f"**Cluster {cluster} samples:**")
-        for c in samples:
-            st.markdown(f"- {c}")

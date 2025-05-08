@@ -12,6 +12,7 @@ dependencies = [
     "fastkml>=1.1.0",
     "geopandas>=1.0.1",
     "google-cloud>=0.34.0",
+    "google-cloud-aiplatform>=1.92.0",
     "google-cloud-bigquery>=3.31.0",
     "h3>=4.2.2",
     "matplotlib>=3.10.1",
@@ -27,6 +28,7 @@ dependencies = [
     "storage>=0.0.4.3",
     "streamlit>=1.45.0",
     "torch>=2.7.0",
+    "vertexai>=1.43.0",
 ]
 
 [dependency-groups]
