@@ -59,11 +59,11 @@ def scrape_traffic_data():
 
 
 def prepare_data():
-    # client = bigquery.Client(credentials=credentials, project=PROJECT_ID)
+    client = bigquery.Client(credentials=credentials, project=PROJECT_ID)
     print("Client created")
     start = time.time()
-    # viz_data = client.query(QUERY).to_dataframe()
-    viz_data = pd.read_csv("data/bq-results-20250508.csv")
+    viz_data = client.query(QUERY).to_dataframe()
+    # viz_data = pd.read_csv("data/bq-results-20250508.csv")
     print("Query executed")
     print("Time taken:", time.time() - start)
     print("Dataframe shape:", viz_data.shape)
