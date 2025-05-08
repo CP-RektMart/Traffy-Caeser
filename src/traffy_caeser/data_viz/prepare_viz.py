@@ -95,7 +95,8 @@ def prepare_data():
         str(cluster): f"rgba({r},{g},{b},{a/255})"
         for cluster, (r, g, b, a) in cluster_colors.items()
     }
-    print(color_map)
+
+    viz_data["cluster"] = viz_data["cluster"].astype(str)
 
     scraped_traffic = scrape_traffic_data()
     return viz_data, clusters_count, cluster_colors, color_map, scraped_traffic

@@ -37,7 +37,7 @@ for c in unique_clusters:
         selected_clusters.append(c)
 
 
-filtered_viz = viz_data[viz_data["cluster"].isin(selected_clusters)]
+filtered_viz = viz_data[viz_data["cluster"].astype(int).isin(selected_clusters)]
 
 
 default_lat = viz_data["latitude"].median()

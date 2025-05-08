@@ -1,6 +1,6 @@
 # Traffy-Caeser
 
-final project for DSDE
+Final Project for DSDE
 
 ## Perequisite
 
@@ -42,4 +42,17 @@ uv run main.py
 # Run visualization
 uv run dv
 or dv
+```
+
+## Project Structure
+```
+.
+├── README.md
+├── data
+├── gcp --> Data Engineering
+├── main.py
+├── notebooks --> Data Science
+├── pyproject.toml
+├── src --> Data Visualization
+└── uv.lock
 ```

@@ -1,3 +1,0 @@
-# ...existing requirements...
-google-cloud-aiplatform>=1.28.0
-vertexai>=0.0.1
