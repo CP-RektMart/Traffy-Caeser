@@ -197,7 +197,7 @@ html_blocks = f"""<div style="display: flex; align-items: center; font-weight: b
 for _, row in scraped_traffic.iterrows():
     html_blocks += f"""
     <div style="display: flex; align-items: center; margin: 6px 0; padding: 6px; background-color: {row_bg_color}; color: {row_text_color}; border-bottom: 1px solid {border_color};">
-        <div style="flex: 0 0 20%; text-align: center; padding: 0px 5px;">{row["time"]}</div>
+        <div style="flex: 0 0 20%; text-align: center;">{row["time"]}</div>
         <div style="flex: 1;">{row["description"]}</div>
     </div>"""
 

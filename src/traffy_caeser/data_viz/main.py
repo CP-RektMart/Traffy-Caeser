@@ -21,8 +21,8 @@ with col1:
     
     ## Dashboard Overview
     This interactive dashboard provides visualization tools to explore the processed data:
-    - **Clustering Analysis**: Explore how comments are grouped by similarity and topics
-    - **Geospatial Visualizations**: View the geographical distribution of comments across regions
+    - **Clustering Analysis**
+    - **Geospatial Visualizations**
     
     Use the sidebar to navigate between different analysis pages and explore the data in depth.
     """
